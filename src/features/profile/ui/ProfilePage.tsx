@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../../components/ui/PageHeader';
 import { Card } from '../../../components/ui/Card';
 import { Field } from '../../../components/ui/Field';
@@ -36,6 +37,10 @@ interface FormErrors {
  */
 export function ProfilePage() {
   const { donor, saveDonor } = useDonorProfile();
+  const location = useLocation();
+  const navigate = useNavigate();
+  // Маршрут, с которого гость был перенаправлен на профиль (FR-1.4)
+  const from = (location.state as { from?: string } | null)?.from;
 
   const [form, setForm] = useState<FormState>({
     phone: donor?.phone ?? '',
@@ -87,7 +92,12 @@ export function ProfilePage() {
       lastDonationAt: donor?.lastDonationAt ?? null,
     };
     saveDonor(nextDonor);
-    setSaved(true);
+    // Возврат к намерению после входа (FR-1.4)
+    if (from) {
+      navigate(from, { replace: true });
+    } else {
+      setSaved(true);
+    }
   }
 
   return (

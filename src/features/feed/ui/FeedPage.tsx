@@ -5,8 +5,8 @@ import { ErrorBanner } from '../../../components/ui/ErrorBanner';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Button } from '../../../components/ui/Button';
 import { useCenters, useRequests } from '../../../api/hooks';
-import { useDonorProfile } from '../../profile/model/DonorProfileContext';
-import { DEFAULT_CITY_CENTER, distanceKm } from '../../../lib/geo';
+import { useUserCoords } from '../../geo/model/useUserCoords';
+import { distanceKm } from '../../../lib/geo';
 import { RequestCard } from './RequestCard';
 import { FeedFiltersBar, type FeedFilters } from './FeedFiltersBar';
 
@@ -17,7 +17,7 @@ const PAGE_SIZE = 5;
  * и пагинацией «Показать ещё».
  */
 export function FeedPage() {
-  const { donor } = useDonorProfile();
+  const { coords: userCoords } = useUserCoords();
   const [filters, setFilters] = useState<FeedFilters>({});
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
@@ -93,9 +93,9 @@ export function FeedPage() {
                   request={request}
                   center={centersById.get(request.centerId)}
                   distance={
-                    donor && centersById.get(request.centerId)
+                    userCoords && centersById.get(request.centerId)
                       ? distanceKm(
-                          DEFAULT_CITY_CENTER,
+                          userCoords,
                           centersById.get(request.centerId)!.coordinates,
                         )
                       : undefined

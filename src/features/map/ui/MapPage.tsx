@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import L from 'leaflet';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,6 +10,7 @@ import { ErrorBanner } from '../../../components/ui/ErrorBanner';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { useCenters, useRequests } from '../../../api/hooks';
 import { useDonorProfile } from '../../profile/model/DonorProfileContext';
+import { useUserCoords } from '../../geo/model/useUserCoords';
 import { getOpenStatus } from '../../../lib/workingHours';
 import {
   DEFAULT_CITY_CENTER,
@@ -48,25 +49,8 @@ export function MapPage() {
     onlyUrgent: false,
     bloodGroup: '',
   });
-  const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
-  const [geoNotice, setGeoNotice] = useState<string | null>(null);
-
   // Геолокация — по запросу браузера; при отказе показываем весь город (матрица ошибок ТЗ)
-  useEffect(() => {
-    if (!('geolocation' in navigator)) {
-      setGeoNotice('Геолокация недоступна — показываем весь город.');
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (position) =>
-        setUserCoords([position.coords.latitude, position.coords.longitude]),
-      () =>
-        setGeoNotice(
-          'Не удалось определить местоположение — показываем весь город. Разрешите доступ в настройках браузера.',
-        ),
-      { timeout: 5000 },
-    );
-  }, []);
+  const { coords: userCoords, notice: geoNotice } = useUserCoords();
 
   const activeRequests = useMemo(
     () => (requestsQuery.data ?? []).filter((r) => r.status === 'active'),
