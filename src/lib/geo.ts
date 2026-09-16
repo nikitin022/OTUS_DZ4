@@ -5,6 +5,9 @@
 /** Радиус Земли, км */
 const EARTH_RADIUS_KM = 6371;
 
+/** Дефолтная точка (центр города), когда геолокация недоступна */
+export const DEFAULT_CITY_CENTER: [number, number] = [55.7558, 37.6173];
+
 function toRad(degrees: number): number {
   return (degrees * Math.PI) / 180;
 }
