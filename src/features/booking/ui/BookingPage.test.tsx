@@ -5,10 +5,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BookingPage } from './BookingPage';
 import { ProfilePage } from '../../profile/ui/ProfilePage';
 import { RequireDonor } from '../../../components/routing/RequireDonor';
-import { DonorProfileProvider } from '../../profile/model/DonorProfileContext';
+import { DonorProfileProvider } from '../../profile/model/DonorProfileProvider';
 import { apiClient } from '../../../api/client';
 import { ApiError } from '../../../api/ApiClient';
-import type { Appointment, Donor } from '../../../types';
+import type { Appointment, Center, Donor } from '../../../types';
 
 vi.mock('../../../api/client', () => ({
   apiClient: {
@@ -25,6 +25,17 @@ vi.mock('../../../api/client', () => ({
 }));
 
 const mockCreateAppointment = vi.mocked(apiClient.createAppointment);
+const mockGetCenters = vi.mocked(apiClient.getCenters);
+
+const center: Center = {
+  id: 'c-1',
+  name: 'Центр крови им. О.К. Гаврилова',
+  address: 'ул. Поликарпова, 14, Москва',
+  coordinates: [55.7858, 37.5901],
+  workingHours: { 1: '08:00-17:00' },
+  phone: '+7 495 945-33-19',
+  isVerified: true,
+};
 
 const donor: Donor = {
   id: 'd-1',
@@ -67,8 +78,8 @@ function renderPage(initialEntry = '/centers/c-1/book') {
   );
 }
 
-function fillAndSubmit() {
-  fireEvent.change(screen.getByLabelText('Дата донации'), {
+async function fillAndSubmit() {
+  fireEvent.change(await screen.findByLabelText('Дата донации'), {
     target: { value: FUTURE_DATE },
   });
   fireEvent.click(screen.getByRole('button', { name: '10:00' }));
@@ -78,14 +89,13 @@ function fillAndSubmit() {
 beforeEach(() => {
   localStorage.clear();
   vi.clearAllMocks();
+  mockGetCenters.mockResolvedValue([center]);
 });
 
 describe('BookingPage — доступ', () => {
   it('гость перенаправляется на профиль (FR-1.4)', () => {
     renderPage();
-    expect(
-      screen.getByRole('heading', { name: 'Профиль донора' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Профиль донора' })).toBeInTheDocument();
   });
 });
 
@@ -103,7 +113,7 @@ describe('BookingPage — позитивный сценарий (FR-5.3)', () =>
     mockCreateAppointment.mockResolvedValue(appointment);
 
     renderPage();
-    fillAndSubmit();
+    await fillAndSubmit();
 
     expect(
       await screen.findByText('Запись создана — ожидает подтверждения центра'),
@@ -122,12 +132,10 @@ describe('BookingPage — позитивный сценарий (FR-5.3)', () =>
 describe('BookingPage — ошибки API (матрица ошибок ТЗ)', () => {
   it('занятый слот: «Выберите другое время»', async () => {
     seedDonor();
-    mockCreateAppointment.mockRejectedValue(
-      new ApiError('Выберите другое время', 'SLOT_TAKEN'),
-    );
+    mockCreateAppointment.mockRejectedValue(new ApiError('Выберите другое время', 'SLOT_TAKEN'));
 
     renderPage();
-    fillAndSubmit();
+    await fillAndSubmit();
 
     expect(await screen.findByText('Выберите другое время')).toBeInTheDocument();
   });
@@ -139,19 +147,28 @@ describe('BookingPage — ошибки API (матрица ошибок ТЗ)', 
     );
 
     renderPage();
-    fillAndSubmit();
+    await fillAndSubmit();
 
-    expect(
-      await screen.findByText(/Интервал не соблюдён/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Интервал не соблюдён/)).toBeInTheDocument();
+  });
+});
+
+describe('BookingPage — карточка центра (регрессия)', () => {
+  it('показывает название и адрес центра, а не внутренний идентификатор', async () => {
+    seedDonor();
+    renderPage();
+
+    expect(await screen.findByText(center.name)).toBeInTheDocument();
+    expect(screen.getByText(center.address)).toBeInTheDocument();
+    expect(screen.queryByText(/c-1/)).not.toBeInTheDocument();
   });
 });
 
 describe('BookingPage — валидация формы', () => {
-  it('требует выбрать дату и время', () => {
+  it('требует выбрать дату и время', async () => {
     seedDonor();
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: 'Записаться' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Записаться' }));
 
     expect(screen.getByText('Выберите дату донации')).toBeInTheDocument();
   });

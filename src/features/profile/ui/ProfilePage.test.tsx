@@ -5,31 +5,27 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ProfilePage } from './ProfilePage';
 import { BookingPage } from '../../booking/ui/BookingPage';
 import { RequireDonor } from '../../../components/routing/RequireDonor';
-import { DonorProfileProvider } from '../model/DonorProfileContext';
+import { DonorProfileProvider } from '../model/DonorProfileProvider';
 
-function renderPage(
-  initialEntry:
-    | string
-    | { pathname: string; state?: unknown } = '/profile',
-) {
+function renderPage(initialEntry: string | { pathname: string; state?: unknown } = '/profile') {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   render(
     <QueryClientProvider client={queryClient}>
       <DonorProfileProvider>
-      <MemoryRouter initialEntries={[initialEntry]}>
-        <Routes>
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route
-            path="/centers/:centerId/book"
-            element={
-              <RequireDonor>
-                <BookingPage />
-              </RequireDonor>
-            }
-          />
-        </Routes>
+        <MemoryRouter initialEntries={[initialEntry]}>
+          <Routes>
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route
+              path="/centers/:centerId/book"
+              element={
+                <RequireDonor>
+                  <BookingPage />
+                </RequireDonor>
+              }
+            />
+          </Routes>
         </MemoryRouter>
       </DonorProfileProvider>
     </QueryClientProvider>,
@@ -49,9 +45,7 @@ describe('ProfilePage — валидация (матрица ошибок ТЗ)'
     });
     fireEvent.click(screen.getByRole('button', { name: 'Сохранить профиль' }));
 
-    expect(
-      screen.getByText('Укажите номер телефона'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Укажите номер телефона')).toBeInTheDocument();
     expect(screen.getByText('Радиус от 1 до 500 км')).toBeInTheDocument();
     expect(
       screen.getByText('Нужно явное согласие на геолокацию и уведомления'),
@@ -60,7 +54,7 @@ describe('ProfilePage — валидация (матрица ошибок ТЗ)'
 });
 
 describe('ProfilePage — сохранение профиля', () => {
-  it('сохраняет профиль и возвращает к намерению (FR-1.4)', () => {
+  it('сохраняет профиль и возвращает к намерению (FR-1.4)', async () => {
     renderPage({
       pathname: '/profile',
       state: { from: '/centers/c-1/book' },
@@ -74,9 +68,8 @@ describe('ProfilePage — сохранение профиля', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Сохранить профиль' }));
 
     // После сохранения донор авторизован — RequireDonor пропускает на запись
-    expect(
-      screen.getByRole('heading', { name: 'Запись на донацию' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Центр № c-1/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Запись на донацию' })).toBeInTheDocument();
+    // Регрессия: в заголовке — название центра из справочника, а не внутренний id
+    expect(await screen.findByText('Центр крови им. О.К. Гаврилова')).toBeInTheDocument();
   });
 });

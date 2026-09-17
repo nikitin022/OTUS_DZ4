@@ -7,7 +7,7 @@ import { ErrorBanner } from '../../../components/ui/ErrorBanner';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { AppointmentStatusPill } from '../../../components/ui/StatusPill';
 import { useDonationHistory } from '../../../api/hooks';
-import { useDonorProfile } from '../../profile/model/DonorProfileContext';
+import { useDonorProfile } from '../../profile/model/profileContext';
 import { isDonationIntervalMet } from '../../../lib/validation';
 import { formatDate, formatVolume } from '../../../lib/format';
 import type { DonationHistoryEntry } from '../../../types';
@@ -82,14 +82,8 @@ export function HistoryPage() {
   }
 
   /** Индикатор интервала: сравниваем запись с предыдущей (более ранней) */
-  function intervalBadge(
-    entry: DonationHistoryEntry,
-    nextOlder: DonationHistoryEntry | undefined,
-  ) {
-    const met = isDonationIntervalMet(
-      nextOlder?.date ?? null,
-      new Date(entry.date),
-    );
+  function intervalBadge(entry: DonationHistoryEntry, nextOlder: DonationHistoryEntry | undefined) {
+    const met = isDonationIntervalMet(nextOlder?.date ?? null, new Date(entry.date));
     return met ? (
       <Badge tone="success">Интервал соблюдён</Badge>
     ) : (
@@ -107,9 +101,7 @@ export function HistoryPage() {
             <Card>
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-base font-semibold text-ink-900">
-                    {formatDate(entry.date)}
-                  </p>
+                  <p className="text-base font-semibold text-ink-900">{formatDate(entry.date)}</p>
                   <p className="text-sm text-ink-600">{entry.centerName}</p>
                 </div>
                 <AppointmentStatusPill
@@ -130,15 +122,11 @@ export function HistoryPage() {
                 </div>
                 <div className="flex justify-between gap-4">
                   <dt className="text-ink-600">Объём</dt>
-                  <dd className="font-medium text-ink-900">
-                    {formatVolume(entry.volumeMl)}
-                  </dd>
+                  <dd className="font-medium text-ink-900">{formatVolume(entry.volumeMl)}</dd>
                 </div>
               </dl>
 
-              <div className="mt-3">
-                {intervalBadge(entry, entries[index + 1])}
-              </div>
+              <div className="mt-3">{intervalBadge(entry, entries[index + 1])}</div>
             </Card>
           </li>
         ))}

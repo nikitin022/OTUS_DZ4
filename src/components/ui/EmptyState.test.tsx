@@ -4,12 +4,8 @@ import { EmptyState } from './EmptyState';
 
 describe('EmptyState', () => {
   it('отображает заголовок и описание', () => {
-    render(
-      <EmptyState title="У вас пока нет записей" description="Пояснение" />,
-    );
-    expect(
-      screen.getByRole('heading', { name: 'У вас пока нет записей' }),
-    ).toBeInTheDocument();
+    render(<EmptyState title="У вас пока нет записей" description="Пояснение" />);
+    expect(screen.getByRole('heading', { name: 'У вас пока нет записей' })).toBeInTheDocument();
     expect(screen.getByText('Пояснение')).toBeInTheDocument();
   });
 
@@ -20,8 +16,6 @@ describe('EmptyState', () => {
         action={<button type="button">Сбросить фильтры</button>}
       />,
     );
-    expect(
-      screen.getByRole('button', { name: 'Сбросить фильтры' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Сбросить фильтры' })).toBeInTheDocument();
   });
 });

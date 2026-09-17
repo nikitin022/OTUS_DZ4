@@ -3,7 +3,10 @@ import { Badge } from './Badge';
 type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'missed';
 type RequestStatus = 'active' | 'closed';
 
-const appointmentLabels: Record<AppointmentStatus, { label: string; tone: 'neutral' | 'warning' | 'success' | 'danger' }> = {
+const appointmentLabels: Record<
+  AppointmentStatus,
+  { label: string; tone: 'neutral' | 'warning' | 'success' | 'danger' }
+> = {
   pending: { label: 'Ожидает подтверждения', tone: 'warning' },
   confirmed: { label: 'Подтверждена', tone: 'success' },
   cancelled: { label: 'Отменена', tone: 'neutral' },

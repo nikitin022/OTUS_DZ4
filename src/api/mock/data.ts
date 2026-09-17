@@ -103,30 +103,130 @@ export interface RequestTemplate {
 
 /** Первичный набор заявок ленты */
 export const REQUEST_TEMPLATES: RequestTemplate[] = [
-  { centerId: 'c-1', bloodGroup: '2', rhFactor: '-', volumeMl: 900, urgency: 'критичная', progress: 0.5, minutesAgo: 12 },
-  { centerId: 'c-3', bloodGroup: '1', rhFactor: '+', volumeMl: 450, urgency: 'срочная', progress: 0.8, minutesAgo: 35 },
-  { centerId: 'c-2', bloodGroup: '4', rhFactor: '+', volumeMl: 1200, urgency: 'обычная', progress: 0.3, minutesAgo: 90 },
-  { centerId: 'c-4', bloodGroup: '3', rhFactor: '-', volumeMl: 600, urgency: 'критичная', progress: 0.15, minutesAgo: 150 },
-  { centerId: 'c-6', bloodGroup: '1', rhFactor: '-', volumeMl: 900, urgency: 'срочная', progress: 0.6, minutesAgo: 240 },
-  { centerId: 'c-1', bloodGroup: '2', rhFactor: '+', volumeMl: 450, urgency: 'обычная', progress: 0.9, minutesAgo: 300 },
-  { centerId: 'c-5', bloodGroup: '3', rhFactor: '+', volumeMl: 1500, urgency: 'срочная', progress: 0.25, minutesAgo: 420 },
-  { centerId: 'c-4', bloodGroup: '1', rhFactor: '+', volumeMl: 450, urgency: 'обычная', progress: 1, minutesAgo: 600 },
-  { centerId: 'c-6', bloodGroup: '4', rhFactor: '-', volumeMl: 600, urgency: 'срочная', progress: 1, minutesAgo: 720 },
+  {
+    centerId: 'c-1',
+    bloodGroup: '2',
+    rhFactor: '-',
+    volumeMl: 900,
+    urgency: 'критичная',
+    progress: 0.5,
+    minutesAgo: 12,
+  },
+  {
+    centerId: 'c-3',
+    bloodGroup: '1',
+    rhFactor: '+',
+    volumeMl: 450,
+    urgency: 'срочная',
+    progress: 0.8,
+    minutesAgo: 35,
+  },
+  {
+    centerId: 'c-2',
+    bloodGroup: '4',
+    rhFactor: '+',
+    volumeMl: 1200,
+    urgency: 'обычная',
+    progress: 0.3,
+    minutesAgo: 90,
+  },
+  {
+    centerId: 'c-4',
+    bloodGroup: '3',
+    rhFactor: '-',
+    volumeMl: 600,
+    urgency: 'критичная',
+    progress: 0.15,
+    minutesAgo: 150,
+  },
+  {
+    centerId: 'c-6',
+    bloodGroup: '1',
+    rhFactor: '-',
+    volumeMl: 900,
+    urgency: 'срочная',
+    progress: 0.6,
+    minutesAgo: 240,
+  },
+  {
+    centerId: 'c-1',
+    bloodGroup: '2',
+    rhFactor: '+',
+    volumeMl: 450,
+    urgency: 'обычная',
+    progress: 0.9,
+    minutesAgo: 300,
+  },
+  {
+    centerId: 'c-5',
+    bloodGroup: '3',
+    rhFactor: '+',
+    volumeMl: 1500,
+    urgency: 'срочная',
+    progress: 0.25,
+    minutesAgo: 420,
+  },
+  {
+    centerId: 'c-4',
+    bloodGroup: '1',
+    rhFactor: '+',
+    volumeMl: 450,
+    urgency: 'обычная',
+    progress: 1,
+    minutesAgo: 600,
+  },
+  {
+    centerId: 'c-6',
+    bloodGroup: '4',
+    rhFactor: '-',
+    volumeMl: 600,
+    urgency: 'срочная',
+    progress: 1,
+    minutesAgo: 720,
+  },
 ];
 
 /** Дополнительные заявки: «живая» лента периодически добавляет их как новые */
 export const EXTRA_REQUEST_TEMPLATES: RequestTemplate[] = [
-  { centerId: 'c-2', bloodGroup: '2', rhFactor: '-', volumeMl: 450, urgency: 'критичная', progress: 0.05, minutesAgo: 0 },
-  { centerId: 'c-5', bloodGroup: '1', rhFactor: '+', volumeMl: 900, urgency: 'срочная', progress: 0.05, minutesAgo: 0 },
-  { centerId: 'c-3', bloodGroup: '4', rhFactor: '+', volumeMl: 450, urgency: 'обычная', progress: 0.05, minutesAgo: 0 },
-  { centerId: 'c-1', bloodGroup: '3', rhFactor: '-', volumeMl: 600, urgency: 'срочная', progress: 0.05, minutesAgo: 0 },
+  {
+    centerId: 'c-2',
+    bloodGroup: '2',
+    rhFactor: '-',
+    volumeMl: 450,
+    urgency: 'критичная',
+    progress: 0.05,
+    minutesAgo: 0,
+  },
+  {
+    centerId: 'c-5',
+    bloodGroup: '1',
+    rhFactor: '+',
+    volumeMl: 900,
+    urgency: 'срочная',
+    progress: 0.05,
+    minutesAgo: 0,
+  },
+  {
+    centerId: 'c-3',
+    bloodGroup: '4',
+    rhFactor: '+',
+    volumeMl: 450,
+    urgency: 'обычная',
+    progress: 0.05,
+    minutesAgo: 0,
+  },
+  {
+    centerId: 'c-1',
+    bloodGroup: '3',
+    rhFactor: '-',
+    volumeMl: 600,
+    urgency: 'срочная',
+    progress: 0.05,
+    minutesAgo: 0,
+  },
 ];
 
-export function templateToRequest(
-  template: RequestTemplate,
-  id: string,
-  now: Date,
-): BloodRequest {
+export function templateToRequest(template: RequestTemplate, id: string, now: Date): BloodRequest {
   const updatedAt = new Date(now.getTime() - template.minutesAgo * 60_000);
   return {
     id,
@@ -150,8 +250,7 @@ export function buildSeedRequests(now: Date): BloodRequest[] {
 
 /** История донаций для демонстрации (одна из донаций — 30 дней назад). */
 export function buildSeedHistory(now: Date): DonationHistoryEntry[] {
-  const iso = (daysAgo: number) =>
-    new Date(now.getTime() - daysAgo * 86_400_000).toISOString();
+  const iso = (daysAgo: number) => new Date(now.getTime() - daysAgo * 86_400_000).toISOString();
   return [
     {
       id: 'h-1',
@@ -183,9 +282,7 @@ export function buildSeedHistory(now: Date): DonationHistoryEntry[] {
   ];
 }
 
-export function buildSeedResponses(
-  now: Date,
-): Record<string, RequestResponse[]> {
+export function buildSeedResponses(now: Date): Record<string, RequestResponse[]> {
   const result: Record<string, RequestResponse[]> = {};
   REQUEST_TEMPLATES.forEach((_, index) => {
     const requestId = `r-${index + 1}`;
@@ -229,11 +326,7 @@ export function applyFeedMutation(
   if (extraTemplates.length > 0 && result.length < 30 && random() < 0.2) {
     const template = extraTemplates[Math.floor(random() * extraTemplates.length)];
     result.unshift(
-      templateToRequest(
-        template,
-        `r-${now.getTime()}-${Math.floor(random() * 1000)}`,
-        now,
-      ),
+      templateToRequest(template, `r-${now.getTime()}-${Math.floor(random() * 1000)}`, now),
     );
   }
 

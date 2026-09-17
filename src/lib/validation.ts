@@ -14,11 +14,7 @@ export const MIN_REQUEST_VOLUME_ML = 1;
 
 /** Радиус поиска донора (FR-1.1): от 1 до 500 км */
 export function validateRadiusKm(value: number): string | null {
-  if (
-    !Number.isFinite(value) ||
-    value < MIN_SEARCH_RADIUS_KM ||
-    value > MAX_SEARCH_RADIUS_KM
-  ) {
+  if (!Number.isFinite(value) || value < MIN_SEARCH_RADIUS_KM || value > MAX_SEARCH_RADIUS_KM) {
     return `Радиус от ${MIN_SEARCH_RADIUS_KM} до ${MAX_SEARCH_RADIUS_KM} км`;
   }
   return null;

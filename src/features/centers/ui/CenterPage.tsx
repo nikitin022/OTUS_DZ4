@@ -86,9 +86,7 @@ export function CenterPage() {
       <Card>
         <div className="flex flex-wrap items-center gap-2">
           {center.isVerified && <Badge tone="success">Проверенный центр</Badge>}
-          <Badge tone={openStatus.isOpen ? 'success' : 'neutral'}>
-            {openStatus.label}
-          </Badge>
+          <Badge tone={openStatus.isOpen ? 'success' : 'neutral'}>{openStatus.label}</Badge>
         </div>
 
         <dl className="mt-4 space-y-3 text-sm">
@@ -99,7 +97,10 @@ export function CenterPage() {
           <div>
             <dt className="text-ink-600">Телефон</dt>
             <dd className="font-medium text-ink-900">
-              <a href={`tel:${center.phone.replace(/[^+\d]/g, '')}`} className="text-primary-700 hover:underline">
+              <a
+                href={`tel:${center.phone.replace(/[^+\d]/g, '')}`}
+                className="text-primary-700 hover:underline"
+              >
                 {center.phone}
               </a>
             </dd>

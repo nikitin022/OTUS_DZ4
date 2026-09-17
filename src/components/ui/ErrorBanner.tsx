@@ -3,7 +3,9 @@ import { Button } from './Button';
 interface ErrorBannerProps {
   /** Сообщение об ошибке (по умолчанию — сценарий «Нет соединения») */
   message?: string;
-  /** Действие «Повторить» */
+  /** Подпись кнопки повтора: «Повторить» или «Обновить сейчас» (матрица ошибок ТЗ) */
+  retryLabel?: string;
+  /** Действие повтора */
   onRetry?: () => void;
 }
 
@@ -13,6 +15,7 @@ interface ErrorBannerProps {
  */
 export function ErrorBanner({
   message = 'Нет соединения. Проверьте интернет.',
+  retryLabel = 'Повторить',
   onRetry,
 }: ErrorBannerProps) {
   return (
@@ -23,7 +26,7 @@ export function ErrorBanner({
       <p className="text-sm text-amber-800">{message}</p>
       {onRetry && (
         <Button variant="secondary" onClick={onRetry}>
-          Повторить
+          {retryLabel}
         </Button>
       )}
     </div>

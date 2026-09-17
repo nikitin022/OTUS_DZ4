@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useDonorProfile } from '../../features/profile/model/DonorProfileContext';
+import { useDonorProfile } from '../../features/profile/model/profileContext';
 
 /**
  * Защита действий, требующих входа (FR-1.4): гость перенаправляется
@@ -11,9 +11,7 @@ export function RequireDonor({ children }: { children: ReactNode }) {
   const location = useLocation();
 
   if (!donor) {
-    return (
-      <Navigate to="/profile" replace state={{ from: location.pathname }} />
-    );
+    return <Navigate to="/profile" replace state={{ from: location.pathname }} />;
   }
 
   return <>{children}</>;

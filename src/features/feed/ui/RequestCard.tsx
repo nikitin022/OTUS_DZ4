@@ -48,9 +48,7 @@ export function RequestCard({ request, center, distance }: RequestCardProps) {
         />
         <div className="mt-1 flex justify-between text-xs text-ink-600">
           <span>
-            {isClosed
-              ? 'Объём собран — спасибо!'
-              : `Осталось ${formatVolume(remaining)}`}
+            {isClosed ? 'Объём собран — спасибо!' : `Осталось ${formatVolume(remaining)}`}
           </span>
           <span>{formatRelativeTime(request.updatedAt)}</span>
         </div>

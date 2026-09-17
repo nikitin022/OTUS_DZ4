@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FeedPage } from './FeedPage';
-import { DonorProfileProvider } from '../../profile/model/DonorProfileContext';
+import { DonorProfileProvider } from '../../profile/model/DonorProfileProvider';
 import { apiClient } from '../../../api/client';
 import type { BloodRequest } from '../../../types';
 
@@ -41,7 +41,7 @@ function renderPage() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return render(
+  const result = render(
     <QueryClientProvider client={queryClient}>
       <DonorProfileProvider>
         <MemoryRouter>
@@ -50,6 +50,7 @@ function renderPage() {
       </DonorProfileProvider>
     </QueryClientProvider>,
   );
+  return { ...result, queryClient };
 }
 
 beforeEach(() => {
@@ -98,9 +99,7 @@ describe('FeedPage — обработка ошибки сети', () => {
     renderPage();
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
-    expect(
-      screen.getByText(/Не удалось загрузить заявки/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Не удалось загрузить заявки/)).toBeInTheDocument();
 
     mockGetRequests.mockResolvedValue([request]);
     fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
@@ -108,6 +107,35 @@ describe('FeedPage — обработка ошибки сети', () => {
     expect(await screen.findByText('I (0) Rh+')).toBeInTheDocument();
     await waitFor(() => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+  });
+});
+
+describe('FeedPage — сбой автообновления (FR-3.3, матрица ошибок ТЗ)', () => {
+  it('показывает плашку «Данные устарели» и «Обновить сейчас», сохраняя данные', async () => {
+    mockGetRequests.mockResolvedValue([request]);
+    const { queryClient } = renderPage();
+    await screen.findByText('I (0) Rh+');
+
+    mockGetRequests.mockRejectedValue(new Error('network down'));
+    await act(async () => {
+      await queryClient.refetchQueries({ queryKey: ['requests'] });
+    });
+
+    expect(
+      await screen.findByText(/Данные могли устареть/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Обновить сейчас' }),
+    ).toBeInTheDocument();
+    // Лента не пропадает: ранее загруженные данные остаются доступными (офлайн-кэш, NFR-15)
+    expect(screen.getByText('I (0) Rh+')).toBeInTheDocument();
+
+    mockGetRequests.mockResolvedValue([request]);
+    fireEvent.click(screen.getByRole('button', { name: 'Обновить сейчас' }));
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Данные могли устареть/)).not.toBeInTheDocument();
     });
   });
 });

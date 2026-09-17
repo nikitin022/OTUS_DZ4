@@ -45,8 +45,7 @@ export function useRequestResponses(requestId: string | undefined) {
 export function useCreateAppointment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: Omit<Appointment, 'id' | 'status'>) =>
-      apiClient.createAppointment(input),
+    mutationFn: (input: Omit<Appointment, 'id' | 'status'>) => apiClient.createAppointment(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['history'] });
     },

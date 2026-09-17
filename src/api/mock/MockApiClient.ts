@@ -7,12 +7,7 @@ import type {
   RequestResponse,
 } from '../../types';
 import { isDonationIntervalMet, validateVolumeMl } from '../../lib/validation';
-import {
-  applyFeedMutation,
-  buildSeedDb,
-  EXTRA_REQUEST_TEMPLATES,
-  type MockDb,
-} from './data';
+import { applyFeedMutation, buildSeedDb, EXTRA_REQUEST_TEMPLATES, type MockDb } from './data';
 
 const STORAGE_KEY = 'kaplya.mockDb';
 const MIN_DELAY_MS = 300;
@@ -58,11 +53,7 @@ export class MockApiClient implements ApiClient {
     await delay();
     const db = loadDb();
     // Имитация живых данных: прогресс и статусы меняются между чтениями
-    db.requests = applyFeedMutation(
-      db.requests,
-      EXTRA_REQUEST_TEMPLATES,
-      new Date(),
-    );
+    db.requests = applyFeedMutation(db.requests, EXTRA_REQUEST_TEMPLATES, new Date());
     saveDb(db);
 
     let result = db.requests;
@@ -76,10 +67,7 @@ export class MockApiClient implements ApiClient {
   }
 
   async createRequest(
-    request: Omit<
-      BloodRequest,
-      'id' | 'createdAt' | 'updatedAt' | 'status' | 'collectedMl'
-    >,
+    request: Omit<BloodRequest, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'collectedMl'>,
   ): Promise<BloodRequest> {
     await delay();
     const volumeError = validateVolumeMl(request.volumeMl);
@@ -101,10 +89,7 @@ export class MockApiClient implements ApiClient {
     return created;
   }
 
-  async updateRequest(
-    id: string,
-    patch: Partial<BloodRequest>,
-  ): Promise<BloodRequest> {
+  async updateRequest(id: string, patch: Partial<BloodRequest>): Promise<BloodRequest> {
     await delay();
     const db = loadDb();
     const request = db.requests.find((r) => r.id === id);
@@ -116,9 +101,7 @@ export class MockApiClient implements ApiClient {
     return request;
   }
 
-  async createAppointment(
-    appointment: Omit<Appointment, 'id' | 'status'>,
-  ): Promise<Appointment> {
+  async createAppointment(appointment: Omit<Appointment, 'id' | 'status'>): Promise<Appointment> {
     await delay();
     const db = loadDb();
 
@@ -153,10 +136,7 @@ export class MockApiClient implements ApiClient {
     return created;
   }
 
-  async updateAppointment(
-    id: string,
-    patch: Partial<Appointment>,
-  ): Promise<Appointment> {
+  async updateAppointment(id: string, patch: Partial<Appointment>): Promise<Appointment> {
     await delay();
     const db = loadDb();
     const appointment = db.appointments.find((a) => a.id === id);
@@ -173,9 +153,7 @@ export class MockApiClient implements ApiClient {
     // В MVP подписка не сохраняется на сервер — имитация успешной регистрации
   }
 
-  async getDonationHistory(
-    _donorId: string,
-  ): Promise<DonationHistoryEntry[]> {
+  async getDonationHistory(_donorId: string): Promise<DonationHistoryEntry[]> {
     await delay();
     // В mock история одинакова для любого донора — для демонстрации UI
     return [...loadDb().history].sort((a, b) => b.date.localeCompare(a.date));

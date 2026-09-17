@@ -15,10 +15,7 @@ function toRad(degrees: number): number {
 /**
  * Расстояние между двумя точками [широта, долгота] в км (формула haversine).
  */
-export function distanceKm(
-  a: [number, number],
-  b: [number, number],
-): number {
+export function distanceKm(a: [number, number], b: [number, number]): number {
   const [lat1, lon1] = a;
   const [lat2, lon2] = b;
   const dLat = toRad(lat2 - lat1);

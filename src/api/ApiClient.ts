@@ -41,7 +41,9 @@ export interface ApiClient {
   getRequests(filters?: RequestFilters): Promise<BloodRequest[]>;
 
   /** FR-7: публикация заявки координатором */
-  createRequest(request: Omit<BloodRequest, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'collectedMl'>): Promise<BloodRequest>;
+  createRequest(
+    request: Omit<BloodRequest, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'collectedMl'>,
+  ): Promise<BloodRequest>;
 
   /** FR-7: редактирование/закрытие заявки */
   updateRequest(id: string, patch: Partial<BloodRequest>): Promise<BloodRequest>;

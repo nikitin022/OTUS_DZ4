@@ -11,8 +11,7 @@ interface ProgressBarProps {
  * Полоса прогресса сбора крови по заявке (FR-3.1).
  */
 export function ProgressBar({ value, max, label }: ProgressBarProps) {
-  const percent =
-    max > 0 ? Math.min(100, Math.max(0, Math.round((value / max) * 100))) : 0;
+  const percent = max > 0 ? Math.min(100, Math.max(0, Math.round((value / max) * 100))) : 0;
 
   return (
     <div

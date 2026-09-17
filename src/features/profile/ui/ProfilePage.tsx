@@ -6,12 +6,8 @@ import { Field } from '../../../components/ui/Field';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
 import { Button } from '../../../components/ui/Button';
-import { useDonorProfile } from '../model/DonorProfileContext';
-import {
-  BLOOD_GROUP_OPTIONS,
-  BLOOD_GROUP_LABELS,
-  RH_OPTIONS,
-} from '../../../lib/bloodGroups';
+import { useDonorProfile } from '../model/profileContext';
+import { BLOOD_GROUP_OPTIONS, BLOOD_GROUP_LABELS, RH_OPTIONS } from '../../../lib/bloodGroups';
 import { validateRadiusKm } from '../../../lib/validation';
 import type { BloodGroup, Donor, RhFactor } from '../../../types';
 
@@ -105,11 +101,7 @@ export function ProfilePage() {
       <PageHeader title="Профиль донора" />
       <Card>
         <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-          <Field
-            label="Номер телефона"
-            htmlFor="profile-phone"
-            error={errors.phone}
-          >
+          <Field label="Номер телефона" htmlFor="profile-phone" error={errors.phone}>
             <Input
               id="profile-phone"
               type="tel"
@@ -121,18 +113,12 @@ export function ProfilePage() {
             />
           </Field>
 
-          <Field
-            label="Группа крови"
-            htmlFor="profile-blood-group"
-            error={errors.bloodGroup}
-          >
+          <Field label="Группа крови" htmlFor="profile-blood-group" error={errors.bloodGroup}>
             <Select
               id="profile-blood-group"
               value={form.bloodGroup}
               invalid={Boolean(errors.bloodGroup)}
-              onChange={(event) =>
-                update('bloodGroup', event.target.value as BloodGroup)
-              }
+              onChange={(event) => update('bloodGroup', event.target.value as BloodGroup)}
             >
               {BLOOD_GROUP_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -146,9 +132,7 @@ export function ProfilePage() {
             <Select
               id="profile-rh"
               value={form.rhFactor}
-              onChange={(event) =>
-                update('rhFactor', event.target.value as RhFactor)
-              }
+              onChange={(event) => update('rhFactor', event.target.value as RhFactor)}
             >
               {RH_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -178,8 +162,13 @@ export function ProfilePage() {
           <fieldset>
             <legend className="text-sm font-medium text-ink-900">Согласия</legend>
             <div className="mt-2 space-y-2">
-              <label className="flex items-center gap-2 text-sm text-ink-600">
+              <label
+                className="flex items-center gap-2 text-sm text-ink-600"
+                htmlFor="profile-consent-geo"
+              >
                 <input
+                  id="profile-consent-geo"
+                  name="consentGeo"
                   type="checkbox"
                   className="h-4 w-4 accent-primary-700"
                   checked={form.consentGeo}
@@ -187,14 +176,17 @@ export function ProfilePage() {
                 />
                 Разрешаю использовать геолокацию
               </label>
-              <label className="flex items-center gap-2 text-sm text-ink-600">
+              <label
+                className="flex items-center gap-2 text-sm text-ink-600"
+                htmlFor="profile-consent-push"
+              >
                 <input
+                  id="profile-consent-push"
+                  name="consentPush"
                   type="checkbox"
                   className="h-4 w-4 accent-primary-700"
                   checked={form.consentPush}
-                  onChange={(event) =>
-                    update('consentPush', event.target.checked)
-                  }
+                  onChange={(event) => update('consentPush', event.target.checked)}
                 />
                 Разрешаю push-уведомления
               </label>
@@ -210,8 +202,7 @@ export function ProfilePage() {
 
           {saved && donor && (
             <p role="status" className="text-sm text-primary-700">
-              Профиль сохранён: {BLOOD_GROUP_LABELS[donor.bloodGroup]},{' '}
-              {donor.searchRadiusKm} км
+              Профиль сохранён: {BLOOD_GROUP_LABELS[donor.bloodGroup]}, {donor.searchRadiusKm} км
             </p>
           )}
         </form>

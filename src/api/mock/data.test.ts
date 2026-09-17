@@ -74,6 +74,8 @@ describe('buildSeedDb', () => {
 
   it('время обновления заявок отсчитывается от переданного момента', () => {
     const request = templateToRequest(REQUEST_TEMPLATES[0], 'r-x', NOW);
-    expect(request.updatedAt).toBe(new Date(NOW.getTime() - REQUEST_TEMPLATES[0].minutesAgo * 60_000).toISOString());
+    expect(request.updatedAt).toBe(
+      new Date(NOW.getTime() - REQUEST_TEMPLATES[0].minutesAgo * 60_000).toISOString(),
+    );
   });
 });

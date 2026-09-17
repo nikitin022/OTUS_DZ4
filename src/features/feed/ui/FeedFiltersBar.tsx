@@ -22,14 +22,14 @@ export function FeedFiltersBar({ filters, onChange }: FeedFiltersBarProps) {
   return (
     <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
       <Select
+        id="feed-blood-group-filter"
+        name="bloodGroup"
         aria-label="Фильтр по группе крови"
         value={filters.bloodGroup ?? ''}
         onChange={(event) =>
           onChange({
             ...filters,
-            bloodGroup: (event.target.value || undefined) as
-              | BloodGroup
-              | undefined,
+            bloodGroup: (event.target.value || undefined) as BloodGroup | undefined,
           })
         }
       >
@@ -42,6 +42,8 @@ export function FeedFiltersBar({ filters, onChange }: FeedFiltersBarProps) {
       </Select>
 
       <Select
+        id="feed-urgency-filter"
+        name="urgency"
         aria-label="Фильтр по срочности"
         value={filters.urgency ?? ''}
         onChange={(event) =>
@@ -59,11 +61,7 @@ export function FeedFiltersBar({ filters, onChange }: FeedFiltersBarProps) {
         ))}
       </Select>
 
-      <Button
-        variant="secondary"
-        disabled={!hasActiveFilters}
-        onClick={() => onChange({})}
-      >
+      <Button variant="secondary" disabled={!hasActiveFilters} onClick={() => onChange({})}>
         Сбросить фильтры
       </Button>
     </div>

@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  isDonationIntervalMet,
-  validateRadiusKm,
-  validateVolumeMl,
-} from './validation';
+import { isDonationIntervalMet, validateRadiusKm, validateVolumeMl } from './validation';
 
 describe('validateRadiusKm', () => {
   it('корректный радиус', () => {

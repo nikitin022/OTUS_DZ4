@@ -9,12 +9,8 @@ export interface OpenStatus {
 }
 
 /** Парсит интервал вида «09:00-18:00» в минуты от начала суток */
-export function parseInterval(
-  interval: string,
-): { start: number; end: number } | null {
-  const match = /^(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})$/.exec(
-    interval.trim(),
-  );
+export function parseInterval(interval: string): { start: number; end: number } | null {
+  const match = /^(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})$/.exec(interval.trim());
   if (!match) return null;
   const [, startH, startM, endH, endM] = match;
   return {

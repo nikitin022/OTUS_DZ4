@@ -8,18 +8,17 @@ import { Badge } from '../../../components/ui/Badge';
 import { Skeleton } from '../../../components/ui/Skeleton';
 import { ErrorBanner } from '../../../components/ui/ErrorBanner';
 import { EmptyState } from '../../../components/ui/EmptyState';
+import { Button } from '../../../components/ui/Button';
 import { useCenters, useRequests } from '../../../api/hooks';
-import { useDonorProfile } from '../../profile/model/DonorProfileContext';
+import { useDonorProfile } from '../../profile/model/profileContext';
 import { useUserCoords } from '../../geo/model/useUserCoords';
 import { getOpenStatus } from '../../../lib/workingHours';
-import {
-  DEFAULT_CITY_CENTER,
-  distanceKm,
-  isWithinRadius,
-} from '../../../lib/geo';
+import { DEFAULT_CITY_CENTER, distanceKm, isWithinRadius } from '../../../lib/geo';
 import { formatDistance } from '../../../lib/format';
+import { matchesSearch } from '../../../lib/search';
 import { buildRouteUrl } from '../../../lib/maps';
-import { MapFiltersBar, type MapFilters } from './MapFiltersBar';
+import { MapFiltersBar } from './MapFiltersBar';
+import { EMPTY_MAP_FILTERS, hasActiveMapFilters, type MapFilters } from '../model/mapFilters';
 
 const DEFAULT_ZOOM = 11;
 /** Радиус поиска для гостя, пока профиль не заполнен */
@@ -45,9 +44,7 @@ export function MapPage() {
   const requestsQuery = useRequests();
 
   const [filters, setFilters] = useState<MapFilters>({
-    onlyOpen: false,
-    onlyUrgent: false,
-    bloodGroup: '',
+    ...EMPTY_MAP_FILTERS,
   });
   // Геолокация — по запросу браузера; при отказе показываем весь город (матрица ошибок ТЗ)
   const { coords: userCoords, notice: geoNotice } = useUserCoords();
@@ -57,25 +54,26 @@ export function MapPage() {
     [requestsQuery.data],
   );
 
+  const hasFilters = hasActiveMapFilters(filters);
+
   const filteredCenters = useMemo(() => {
     const centers = centersQuery.data ?? [];
     return centers.filter((center) => {
+      if (!matchesSearch(filters.search, center.name, center.address)) {
+        return false;
+      }
       if (filters.onlyOpen && !getOpenStatus(center.workingHours).isOpen) {
         return false;
       }
       if (
         filters.onlyUrgent &&
-        !activeRequests.some(
-          (r) => r.centerId === center.id && r.urgency !== 'обычная',
-        )
+        !activeRequests.some((r) => r.centerId === center.id && r.urgency !== 'обычная')
       ) {
         return false;
       }
       if (
         filters.bloodGroup &&
-        !activeRequests.some(
-          (r) => r.centerId === center.id && r.bloodGroup === filters.bloodGroup,
-        )
+        !activeRequests.some((r) => r.centerId === center.id && r.bloodGroup === filters.bloodGroup)
       ) {
         return false;
       }
@@ -87,13 +85,7 @@ export function MapPage() {
       }
       return true;
     });
-  }, [
-    centersQuery.data,
-    activeRequests,
-    filters,
-    userCoords,
-    donor?.searchRadiusKm,
-  ]);
+  }, [centersQuery.data, activeRequests, filters, userCoords, donor?.searchRadiusKm]);
 
   return (
     <div>
@@ -118,14 +110,24 @@ export function MapPage() {
         <EmptyState
           icon="🏥"
           title="Центров не найдено"
-          description="В выбранном радиусе нет подходящих центров. Измените радиус в профиле или сбросьте фильтры."
+          description={
+            hasFilters
+              ? 'По выбранным условиям ничего не найдено. Сбросьте фильтры или измените радиус в профиле.'
+              : 'В выбранном радиусе нет подходящих центров. Измените радиус в профиле.'
+          }
           action={
-            <Link
-              to="/profile"
-              className="inline-flex min-h-11 items-center rounded-lg bg-primary-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-800"
-            >
-              Изменить радиус
-            </Link>
+            hasFilters ? (
+              <Button variant="secondary" onClick={() => setFilters({ ...EMPTY_MAP_FILTERS })}>
+                Сбросить фильтры
+              </Button>
+            ) : (
+              <Link
+                to="/profile"
+                className="inline-flex min-h-11 items-center rounded-lg bg-primary-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-800"
+              >
+                Изменить радиус
+              </Link>
+            )
           }
         />
       ) : (
@@ -150,12 +152,8 @@ export function MapPage() {
                 >
                   <Popup>
                     <div className="min-w-44">
-                      <p className="text-sm font-semibold text-ink-900">
-                        {center.name}
-                      </p>
-                      <p className="mt-0.5 text-xs text-ink-600">
-                        {center.address}
-                      </p>
+                      <p className="text-sm font-semibold text-ink-900">{center.name}</p>
+                      <p className="mt-0.5 text-xs text-ink-600">{center.address}</p>
                       <p className="mt-1.5">
                         <Badge tone={openStatus.isOpen ? 'success' : 'neutral'}>
                           {openStatus.label}
@@ -163,10 +161,7 @@ export function MapPage() {
                       </p>
                       {userCoords && (
                         <p className="mt-1 text-xs text-ink-600">
-                          {formatDistance(
-                            distanceKm(userCoords, center.coordinates),
-                          )}{' '}
-                          от вас
+                          {formatDistance(distanceKm(userCoords, center.coordinates))} от вас
                         </p>
                       )}
                       <div className="mt-2 flex flex-wrap gap-2">

@@ -111,24 +111,17 @@ export function RequestPage() {
         <dl className="mt-3 space-y-2 text-sm">
           <div className="flex justify-between gap-4">
             <dt className="text-ink-600">Объём</dt>
-            <dd className="font-medium text-ink-900">
-              {formatVolume(request.volumeMl)}
-            </dd>
+            <dd className="font-medium text-ink-900">{formatVolume(request.volumeMl)}</dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-ink-600">Собрано</dt>
-            <dd className="font-medium text-ink-900">
-              {formatVolume(request.collectedMl)}
-            </dd>
+            <dd className="font-medium text-ink-900">{formatVolume(request.collectedMl)}</dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-ink-600">Центр</dt>
             <dd className="font-medium">
               {center ? (
-                <Link
-                  to={`/centers/${center.id}`}
-                  className="text-primary-700 hover:underline"
-                >
+                <Link to={`/centers/${center.id}`} className="text-primary-700 hover:underline">
                   {center.name}
                 </Link>
               ) : (
@@ -138,16 +131,12 @@ export function RequestPage() {
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-ink-600">Обновлено</dt>
-            <dd className="font-medium text-ink-900">
-              {formatRelativeTime(request.updatedAt)}
-            </dd>
+            <dd className="font-medium text-ink-900">{formatRelativeTime(request.updatedAt)}</dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-ink-600">Откликнулись</dt>
             <dd className="font-medium text-ink-900">
-              {responsesQuery.data
-                ? `${responsesQuery.data.length} чел.`
-                : '…'}
+              {responsesQuery.data ? `${responsesQuery.data.length} чел.` : '…'}
             </dd>
           </div>
         </dl>
