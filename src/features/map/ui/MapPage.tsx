@@ -131,7 +131,7 @@ export function MapPage() {
           }
         />
       ) : (
-        <div className="h-80 overflow-hidden rounded-card border border-slate-200">
+        <div className="h-80 overflow-hidden rounded-card border border-slate-200 md:h-[420px]">
           <MapContainer
             center={userCoords ?? DEFAULT_CITY_CENTER}
             zoom={DEFAULT_ZOOM}

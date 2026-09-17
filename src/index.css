@@ -43,4 +43,26 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-primary-700;
   }
+
+  /* Мобильные браузеры: без серых вспышек при тапе */
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/*
+  Адаптивное поведение полей ввода: на экранах < 640px принудительно 16px,
+  иначе iOS Safari увеличивает страницу при фокусе на поле с font-size 14px.
+  На десктопе остаётся типографика компонента (text-sm).
+*/
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
