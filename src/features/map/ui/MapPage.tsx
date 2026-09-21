@@ -7,8 +7,10 @@ import { PageHeader } from '../../../components/ui/PageHeader';
 import { Badge } from '../../../components/ui/Badge';
 import { Skeleton } from '../../../components/ui/Skeleton';
 import { ErrorBanner } from '../../../components/ui/ErrorBanner';
+import { PageGate } from '../../../components/ui/PageGate';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Button } from '../../../components/ui/Button';
+import { LinkButton } from '../../../components/ui/LinkButton';
 import { useCenters, useRequests } from '../../../api/hooks';
 import { useDonorProfile } from '../../profile/model/profileContext';
 import { useUserCoords } from '../../geo/model/useUserCoords';
@@ -99,38 +101,31 @@ export function MapPage() {
         </div>
       )}
 
-      {centersQuery.isPending ? (
-        <Skeleton className="h-80 w-full" />
-      ) : centersQuery.isError ? (
-        <ErrorBanner
-          message="Не удалось загрузить центры. Проверьте соединение."
-          onRetry={() => void centersQuery.refetch()}
-        />
-      ) : filteredCenters.length === 0 ? (
-        <EmptyState
-          icon="🏥"
-          title="Центров не найдено"
-          description={
-            hasFilters
-              ? 'По выбранным условиям ничего не найдено. Сбросьте фильтры или измените радиус в профиле.'
-              : 'В выбранном радиусе нет подходящих центров. Измените радиус в профиле.'
-          }
-          action={
-            hasFilters ? (
-              <Button variant="secondary" onClick={() => setFilters({ ...EMPTY_MAP_FILTERS })}>
-                Сбросить фильтры
-              </Button>
-            ) : (
-              <Link
-                to="/profile"
-                className="inline-flex min-h-11 items-center rounded-lg bg-primary-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-800"
-              >
-                Изменить радиус
-              </Link>
-            )
-          }
-        />
-      ) : (
+      <PageGate
+        queries={[centersQuery, requestsQuery]}
+        skeleton={<Skeleton className="h-80 w-full" />}
+        errorMessage="Не удалось загрузить центры. Проверьте соединение."
+      >
+        {filteredCenters.length === 0 ? (
+          <EmptyState
+            icon="🏥"
+            title="Центров не найдено"
+            description={
+              hasFilters
+                ? 'По выбранным условиям ничего не найдено. Сбросьте фильтры или измените радиус в профиле.'
+                : 'В выбранном радиусе нет подходящих центров. Измените радиус в профиле.'
+            }
+            action={
+              hasFilters ? (
+                <Button variant="secondary" onClick={() => setFilters({ ...EMPTY_MAP_FILTERS })}>
+                  Сбросить фильтры
+                </Button>
+              ) : (
+                <LinkButton to="/profile">Изменить радиус</LinkButton>
+              )
+            }
+          />
+        ) : (
         <div className="h-80 overflow-hidden rounded-card border border-slate-200 md:h-[420px]">
           <MapContainer
             center={userCoords ?? DEFAULT_CITY_CENTER}
@@ -187,7 +182,8 @@ export function MapPage() {
             })}
           </MapContainer>
         </div>
-      )}
+        )}
+      </PageGate>
     </div>
   );
 }

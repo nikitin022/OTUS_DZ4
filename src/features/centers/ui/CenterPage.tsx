@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { PageHeader } from '../../../components/ui/PageHeader';
 import { Card } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
 import { Skeleton } from '../../../components/ui/Skeleton';
-import { ErrorBanner } from '../../../components/ui/ErrorBanner';
+import { PageGate } from '../../../components/ui/PageGate';
 import { EmptyState } from '../../../components/ui/EmptyState';
-import { useCenters, useRequests } from '../../../api/hooks';
+import { LinkButton } from '../../../components/ui/LinkButton';
+import { useCenter, useRequests } from '../../../api/hooks';
 import { getOpenStatus } from '../../../lib/workingHours';
 import { formatBloodGroup } from '../../../lib/bloodGroups';
 import { buildRouteUrl } from '../../../lib/maps';
@@ -20,10 +21,8 @@ const DAY_LABELS = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 export function CenterPage() {
   const { centerId } = useParams<{ centerId: string }>();
 
-  const centersQuery = useCenters();
+  const { centersQuery, center } = useCenter(centerId);
   const requestsQuery = useRequests();
-
-  const center = centersQuery.data?.find((c) => c.id === centerId);
 
   const neededGroups = useMemo(() => {
     const groups = new Set<string>();
@@ -35,48 +34,36 @@ export function CenterPage() {
     return [...groups];
   }, [requestsQuery.data, centerId]);
 
-  if (centersQuery.isPending) {
-    return (
-      <div>
-        <PageHeader title="Центр крови" showBack />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <PageGate
+        queries={[centersQuery]}
+        header={<PageHeader title="Центр крови" showBack />}
+        skeleton={<Skeleton className="h-64 w-full" />}
+        errorMessage="Не удалось загрузить данные центра."
+      >
+        {center ? (
+          <CenterDetails center={center} neededGroups={neededGroups} />
+        ) : (
+          <EmptyState
+            icon="🏥"
+            title="Центр не найден"
+            description="Возможно, данные устарели. Вернитесь к карте и выберите центр заново."
+            action={<LinkButton to="/map">На карту</LinkButton>}
+          />
+        )}
+      </PageGate>
+    </div>
+  );
+}
 
-  if (centersQuery.isError) {
-    return (
-      <div>
-        <PageHeader title="Центр крови" showBack />
-        <ErrorBanner
-          message="Не удалось загрузить данные центра."
-          onRetry={() => void centersQuery.refetch()}
-        />
-      </div>
-    );
-  }
-
-  if (!center) {
-    return (
-      <div>
-        <PageHeader title="Центр крови" showBack />
-        <EmptyState
-          icon="🏥"
-          title="Центр не найден"
-          description="Возможно, данные устарели. Вернитесь к карте и выберите центр заново."
-          action={
-            <Link
-              to="/map"
-              className="inline-flex min-h-11 items-center rounded-lg bg-primary-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-800"
-            >
-              На карту
-            </Link>
-          }
-        />
-      </div>
-    );
-  }
-
+function CenterDetails({
+  center,
+  neededGroups,
+}: {
+  center: NonNullable<ReturnType<typeof useCenter>['center']>;
+  neededGroups: string[];
+}) {
   const openStatus = getOpenStatus(center.workingHours);
 
   return (
@@ -142,20 +129,10 @@ export function CenterPage() {
         </dl>
 
         <div className="mt-5 flex flex-wrap gap-2">
-          <Link
-            to={`/centers/${center.id}/book`}
-            className="inline-flex min-h-11 items-center rounded-lg bg-primary-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-800"
-          >
-            Записаться
-          </Link>
-          <a
-            href={buildRouteUrl(center)}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-11 items-center rounded-lg border border-primary-700 px-4 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-50"
-          >
+          <LinkButton to={`/centers/${center.id}/book`}>Записаться</LinkButton>
+          <LinkButton href={buildRouteUrl(center)} target="_blank" rel="noreferrer" variant="secondary">
             Построить маршрут
-          </a>
+          </LinkButton>
         </div>
       </Card>
     </div>

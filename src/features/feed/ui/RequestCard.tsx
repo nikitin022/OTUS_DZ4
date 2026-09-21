@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import type { BloodRequest, Center } from '../../../types';
 import { Card } from '../../../components/ui/Card';
@@ -17,8 +18,14 @@ interface RequestCardProps {
 /**
  * Карточка заявки в живой ленте (FR-3.1): группа, объём, срочность,
  * расстояние, прогресс, время обновления.
+ * Обёрнута в memo: при тиках автообновления перерисовываются только
+ * изменившиеся заявки, а не весь список.
  */
-export function RequestCard({ request, center, distance }: RequestCardProps) {
+export const RequestCard = memo(function RequestCard({
+  request,
+  center,
+  distance,
+}: RequestCardProps) {
   const remaining = request.volumeMl - request.collectedMl;
   const isClosed = request.status === 'closed';
 
@@ -64,4 +71,4 @@ export function RequestCard({ request, center, distance }: RequestCardProps) {
       </div>
     </Card>
   );
-}
+});

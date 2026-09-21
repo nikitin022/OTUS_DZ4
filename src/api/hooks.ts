@@ -41,6 +41,15 @@ export function useRequestResponses(requestId: string | undefined) {
   });
 }
 
+/** Центр по идентификатору из кэша центров (селектор над useCenters) */
+export function useCenter(centerId: string | undefined) {
+  const centersQuery = useCenters();
+  return {
+    centersQuery,
+    center: centersQuery.data?.find((c) => c.id === centerId),
+  };
+}
+
 /** Создание записи на донацию (FR-5) */
 export function useCreateAppointment() {
   const queryClient = useQueryClient();

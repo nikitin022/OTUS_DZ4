@@ -1,14 +1,25 @@
+import { Suspense, lazy } from 'react';
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { Layout } from './Layout';
 import { NotFoundPage } from './NotFoundPage';
 import { RequireDonor } from '../components/routing/RequireDonor';
-import { MapPage } from '../features/map/ui/MapPage';
+import { Skeleton } from '../components/ui/Skeleton';
 import { CenterPage } from '../features/centers/ui/CenterPage';
 import { FeedPage } from '../features/feed/ui/FeedPage';
 import { RequestPage } from '../features/feed/ui/RequestPage';
 import { BookingPage } from '../features/booking/ui/BookingPage';
 import { HistoryPage } from '../features/history/ui/HistoryPage';
 import { ProfilePage } from '../features/profile/ui/ProfilePage';
+
+/**
+ * Карта — самый тяжёлый экран (Leaflet + тайлы), вынесен в отдельный чанк
+ * и загружается лениво, чтобы не увеличивать главный бандл (NFR-1).
+ */
+const MapPage = lazy(() =>
+  import('../features/map/ui/MapPage').then((module) => ({
+    default: module.MapPage,
+  })),
+);
 
 export const router = createBrowserRouter(
   [
@@ -17,8 +28,17 @@ export const router = createBrowserRouter(
       element: <Layout />,
       children: [
         { index: true, element: <Navigate to="/map" replace /> },
-        // FR-2: карта центров
-        { path: 'map', element: <MapPage /> },
+        // FR-2: карта центров (ленивый чанк с Leaflet)
+        {
+          path: 'map',
+          element: (
+            <Suspense
+              fallback={<Skeleton className="h-80 w-full md:h-[420px]" />}
+            >
+              <MapPage />
+            </Suspense>
+          ),
+        },
         { path: 'centers/:centerId', element: <CenterPage /> },
         // FR-5: запись на донацию — только для авторизованных (FR-1.4)
         {
