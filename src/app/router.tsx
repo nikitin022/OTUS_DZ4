@@ -66,5 +66,8 @@ export const router = createBrowserRouter(
     future: {
       v7_relativeSplatPath: true,
     },
+    // Базовый путь для хостинга в подкаталоге (GitHub Pages: /OTUS_DZ4/);
+    // в dev и при корневом деплое BASE_URL === '/'
+    basename: import.meta.env.BASE_URL,
   },
 );

@@ -54,11 +54,14 @@ describe('PageGate — состояния экрана по матрице ош�
     expect(second.refetch).toHaveBeenCalledTimes(1);
   });
 
-  it('успех: шапка и контент отображаются, баннеров нет', () => {
-    renderGate([queryStub(), queryStub()]);
+  it('успех: контент отображается без шапки из PageGate (шапку рендерит контент)', () => {
+    renderGate([queryStub(), queryStub()], <h1>Шапка контента</h1>);
 
-    expect(screen.getByRole('heading', { name: 'Заголовок экрана' })).toBeInTheDocument();
-    expect(screen.getByText('Контент')).toBeInTheDocument();
+    // header-проп не рендерится в состоянии успеха
+    expect(screen.queryByRole('heading', { name: 'Заголовок экрана' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Шапка контента' })).toBeInTheDocument();
+    expect(screen.queryByText('Контент')).not.toBeInTheDocument();
+    expect(screen.getByText('Шапка контента')).toBeInTheDocument();
     expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Повторить' })).not.toBeInTheDocument();
   });

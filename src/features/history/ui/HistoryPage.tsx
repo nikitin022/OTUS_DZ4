@@ -48,6 +48,7 @@ export function HistoryPage() {
         }
         errorMessage="Не удалось загрузить историю."
       >
+        <PageHeader title="История донаций" />
         <HistoryList entries={historyQuery.data ?? []} />
       </PageGate>
     </div>

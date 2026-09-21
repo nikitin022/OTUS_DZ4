@@ -45,18 +45,24 @@ export function BookingPage() {
         errorMessage="Не удалось загрузить данные центра."
       >
         {center ? (
-          <BookingForm
-            center={center}
-            donor={donor}
-            createAppointment={createAppointment}
-          />
+          <>
+            <PageHeader title="Запись на донацию" showBack />
+            <BookingForm
+              center={center}
+              donor={donor}
+              createAppointment={createAppointment}
+            />
+          </>
         ) : (
-          <EmptyState
-            icon="🏥"
-            title="Центр не найден"
-            description="Возможно, данные устарели. Вернитесь к карте и выберите центр заново."
-            action={<LinkButton to="/map">Перейти к карте</LinkButton>}
-          />
+          <>
+            <PageHeader title="Запись на донацию" showBack />
+            <EmptyState
+              icon="🏥"
+              title="Центр не найден"
+              description="Возможно, данные устарели. Вернитесь к карте и выберите центр заново."
+              action={<LinkButton to="/map">Перейти к карте</LinkButton>}
+            />
+          </>
         )}
       </PageGate>
     </div>

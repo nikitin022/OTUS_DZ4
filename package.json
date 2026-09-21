@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:pages": "tsc --noEmit && vite build --base=/OTUS_DZ4/ && node -e \"require('fs').copyFileSync('dist/index.html','dist/404.html')\"",
+    "deploy": "npm run build:pages && npx --yes gh-pages -d dist",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

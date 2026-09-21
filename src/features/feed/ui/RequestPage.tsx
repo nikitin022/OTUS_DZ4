@@ -34,6 +34,7 @@ export function RequestPage() {
         skeleton={<Skeleton className="h-64 w-full" />}
         errorMessage="Не удалось загрузить заявку."
       >
+        <PageHeader title="Заявка" showBack />
         <RequestDetails
           request={request}
           center={center}

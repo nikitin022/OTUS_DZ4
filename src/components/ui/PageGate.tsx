@@ -11,7 +11,8 @@ interface QueryLike {
 interface PageGateProps {
   /** Один или несколько запросов, от которых зависит контент */
   queries: QueryLike[];
-  /** Шапка экрана (PageHeader) — рендерится во всех состояниях */
+  /** Шапка для состояний загрузки и ошибки; в состоянии успеха
+   * шапку рендерит сам контент (у экранов она зависит от данных) */
   header?: ReactNode;
   /** Скелетон на время загрузки (например, `<Skeleton className="h-80 w-full" />`) */
   skeleton: ReactNode;
@@ -61,10 +62,5 @@ export function PageGate({
     );
   }
 
-  return (
-    <>
-      {header}
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
